@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lyrics Finder</title>
+</head>
+
+<body>
+  <h1>Lyrics Finder</h1>
+  <label for="artist">Artist:</label>
+  <input type="text" id="artist" name="artist" placeholder="Enter artist name" required>
+  <br> <br>
+  <label for="song">Song:</label>
+  <input type="text" id="song" name="song" placeholder="Enter song title" required> 
+  <br> <br>
+  <button onclick="getLyrics()">Find Lyrics</button>
+  <div id="lyrics-container"></div>
+
+  <script>
+        async function getLyrics() {
+        const song = document.getElementById('song').value;
+        const artist = document.getElementById('artist').value;
+        //       const searchString = `${song} ${artist}`; // Combine song and artist into a single string
+        
+        // Make API call with searchString
+        // Replace the API_URL below with the actual API URL and include the searchString
+        //       const API_URL = `https://api.example.com/search?q=${encodeURIComponent(searchString)}`;
+        const url = "https://api.lyrics.ovh/v1/" + artist + "/" + song
+        console.log(url)
+      
+        const res = await fetch(url)
+        if (!res.ok) {
+                displayLyrics("Please check the artist/song names and try again!")
+                throw new Error("network call error")
+        }
+
+        const data = await res.json()
+
+        lyrics = data.lyrics
+        console.log(lyrics)
+        songName = lyrics.slice(lyrics.indexOf("chanson") + 8, lyrics.indexOf(" par"))
+        artistName = lyrics.slice(lyrics.indexOf("par") + 4, lyrics.indexOf("\n") - 1)
+        lyrics = lyrics.slice(lyrics.indexOf('\n'))
+
+        lyrics = "~~~~~~~~~~~~~~~~\nLyrics for <b>" + songName + "</b> by <b>" + artistName + "</b>: \n" + lyrics + "\n~~~~~~~~~~~~~~~~"
+
+        displayLyrics(lyrics)
+        }
+
+    function displayLyrics(lyrics) {
+      const lyricsContainer = document.getElementById('lyrics-container');
+      lyricsContainer.innerHTML = `<pre>${lyrics}</pre>`;
+    }
+  </script>
+
+  <p> <b>
+        Give an artist/song combo to generate lyrics for the song! <br>
+        Answer to questions: <br>
+        The api I selected is called "lyrics.ovh". It returns data with lyric data for a given song <br>
+        I found it from this list: https://github.com/public-apis/public-apis?tab=readme-ov-file#music <br>
+        The parameters needed to provide during the API calls are the artist name and song name <br>
+        This api would be helpful in music streaming/buying services, like Spotify (it already is a feature) <br>
+        This api would also be helpful in karaoke machines, if the user would like to query for any song <br>
+  </b>
+</p>
+</body>
+</html>
